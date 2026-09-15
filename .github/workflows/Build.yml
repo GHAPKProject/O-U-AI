@@ -10,38 +10,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Unzip Project Archive
+      # 2. Extract ZIP and locate project root
+      - name: Unzip and Locate Project
         run: |
           if [ -f "OU_AI_Project.zip" ]; then
             unzip -o OU_AI_Project.zip
           fi
-          if [ -d "ou_ai" ]; then
-            mv ou_ai/* . || true
-            mv ou_ai/.* . || true
+          
+          # Find directory containing pubspec.yaml
+          PUBSPEC_PATH=$(find . -maxdepth 3 -name "pubspec.yaml" | head -n 1)
+          if [ -n "$PUBSPEC_PATH" ]; then
+            TARGET_DIR=$(dirname "$PUBSPEC_PATH")
+            if [ "$TARGET_DIR" != "." ]; then
+              echo "Found project in $TARGET_DIR. Copying to root..."
+              cp -rn "$TARGET_DIR"/* . || true
+            fi
           fi
 
-      - name: Set up Java JDK 17
+      # 3. Set up Java JDK 17
+      - name: Set up Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
+      # 4. Set up Flutter SDK
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
+      # 5. Auto-repair and scaffold missing Android Gradle files
+      - name: Auto-Repair Missing Android Configuration
+        run: |
+          flutter create . --platforms=android --org=com.example --project-name=ou_ai
+
+      # 6. Install project dependencies
       - name: Install Dependencies
         run: flutter pub get
 
+      # 7. Compile Release APK
       - name: Compile Android Release APK
         run: flutter build apk --release --no-tree-shake-icons
 
+      # 8. Upload finished APK artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: OU_AI_Release_APK
           path: build/app/outputs/flutter-apk/app-release.apk
+          

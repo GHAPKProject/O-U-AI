@@ -1,4 +1,4 @@
-     name: Build O'U AI APK from ZIP
+name: Build O'U AI APK from ZIP
 
 on:
   push:
@@ -74,85 +74,6 @@ jobs:
           flutter build apk --release --no-tree-shake-icons --extra-front-end-options=--enable-experiment=dot-shorthands
 
       # 10. Upload Artifact
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: OU_AI_Release_APK
-          path: build/app/outputs/flutter-apk/app-release.apk     java-version: '17'
-
-      # 4. Set up Flutter SDK
-      - name: Set up Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      # 5. Auto-repair missing Android files
-      - name: Auto-Repair Android Project
-        run: |
-          flutter create . --platforms=android --org=com.example --project-name=ou_ai
-
-      # 6. FIX: Create valid placeholder assets/icon.png if missing
-      - name: Ensure Icon Asset Exists
-        run: |
-          mkdir -p assets
-          if [ ! -f "assets/icon.png" ]; then
-            echo "Creating default icon.png..."
-            echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" | base64 -d > assets/icon.png
-          fi
-
-      # 7. Auto-fix Dart shorthand syntax in main.dart
-      - name: Fix Dart Shorthand Syntax Errors
-        run: |
-          if [ -f "lib/main.dart" ]; then
-            sed -i 's/: \.fromSeed/: ColorScheme.fromSeed/g' lib/main.dart
-            sed -i 's/: \.center/: MainAxisAlignment.center/g' lib/main.dart
-          fi
-
-      # 8. Install Dependencies
-      - name: Install Dependencies
-        run: flutter pub get
-
-      # 9. Compile Release APK
-      - name: Compile Android Release APK
-        run: |
-          flutter build apk --release --no-tree-shake-icons --extra-front-end-options=--enable-experiment=dot-shorthands
-
-      # 10. Upload Artifact
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: OU_AI_Release_APK
-          path: build/app/outputs/flutter-apk/app-release.apk        java-version: '17'
-
-      # 4. Set up Flutter SDK
-      - name: Set up Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      # 5. Auto-repair missing Android files
-      - name: Auto-Repair Android Project
-        run: |
-          flutter create . --platforms=android --org=com.example --project-name=ou_ai
-
-      # 6. Auto-fix Dart shorthand syntax in main.dart
-      - name: Fix Dart Shorthand Syntax Errors
-        run: |
-          if [ -f "lib/main.dart" ]; then
-            sed -i 's/: \.fromSeed/: ColorScheme.fromSeed/g' lib/main.dart
-            sed -i 's/: \.center/: MainAxisAlignment.center/g' lib/main.dart
-          fi
-
-      # 7. Install Dependencies
-      - name: Install Dependencies
-        run: flutter pub get
-
-      # 8. Compile Release APK (with dot-shorthands experiment flag enabled)
-      - name: Compile Android Release APK
-        run: |
-          flutter build apk --release --no-tree-shake-icons --extra-front-end-options=--enable-experiment=dot-shorthands
-
-      # 9. Upload Artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
